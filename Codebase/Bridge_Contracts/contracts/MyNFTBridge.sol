@@ -223,6 +223,7 @@ interface MyNFTBridgeERC721Departure /* is ERC165, ERC721TokenReceiver */ {
     /// If the owner has access to a private key, it should be the owner.
     /// @param _originHeight The height of the origin universe (usually block.timestamp)
     /// If the owner has access to a private key, it should be the owner.
+
     /// @return The bytes32 migrationHash that would be generated in such a migration
     function generateMigrationHashERC721Full(   
         bytes32 _originUniverse, 
@@ -236,7 +237,8 @@ interface MyNFTBridgeERC721Departure /* is ERC165, ERC721TokenReceiver */ {
         bytes32 _destinationTokenId,
         bytes32 _destinationOwner,
         bytes32 _signee,
-        bytes32 _originHeight
+        bytes32 _originHeight,
+        bytes32 _forkHash
     ) external pure returns (bytes32);
     
 
@@ -338,6 +340,7 @@ interface MyNFTBridgeERC721toERC721Arrival {
         address _destinationOwner,
         address _signee,
         bytes32 _height,
+        bytes32 _forkHash,
         bytes calldata _relayedMigrationHashSigned
     ) external;
 
@@ -380,6 +383,7 @@ interface MyNFTBridgeERC721toERC721Arrival {
         address _destinationOwner,
         address _signee,
         bytes32 _height,
+        bytes32 _forkHash,
         bytes calldata _relayedMigrationHashSigned
     ) external;
 

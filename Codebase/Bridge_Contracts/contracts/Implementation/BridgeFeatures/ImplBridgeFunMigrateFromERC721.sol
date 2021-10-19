@@ -38,7 +38,8 @@ contract ImplMyNFTBridgeFunMigrateFromERC721  is ImplMemoryStructure, MyNFTBridg
     /// @param _signee The address that will be verified as signing the transfer as legitimate on the destination
     /// If the owner has access to a private key, it should be the owner.
     /// A relay unable to lie on _signee from the departure bridge to here is a trustless relay
-    /// @param _height The verification parameter allowing to check which fork was the escrow made on. Usually 
+    /// @param _height The height of the universe when the migration hash was generated
+    /// @param _forkHash The verification parameter allowing to check which fork was the escrow made on. Usually 
     /// equals to blockhash(block.number - 1) ^ bytes32(uint(uint160(address(block.coinbase))
     /// @param _relayedMigrationHashSigned The _escrowHash of the origin chain, hashed with the relay public address then signed by _signee
     function migrateFromIOUERC721ToERC721(
@@ -52,6 +53,7 @@ contract ImplMyNFTBridgeFunMigrateFromERC721  is ImplMemoryStructure, MyNFTBridg
         address _destinationOwner,
         address _signee,
         bytes32 _height,
+        bytes32 _forkHash,
         bytes calldata _relayedMigrationHashSigned
     ) external override {
         
@@ -66,7 +68,8 @@ contract ImplMyNFTBridgeFunMigrateFromERC721  is ImplMemoryStructure, MyNFTBridg
                 _destinationTokenId,
                 _destinationOwner,
                 _signee,
-                _height
+                _height,
+                _forkHash
         );
 
         //Check that the escrow hash have been legitimately signed for this relay
@@ -135,6 +138,7 @@ contract ImplMyNFTBridgeFunMigrateFromERC721  is ImplMemoryStructure, MyNFTBridg
         address _destinationOwner,
         address _signee,
         bytes32 _height,
+        bytes32 _forkHash,
         bytes calldata _relayedMigrationHashSigned
     ) external override {
 
@@ -153,7 +157,8 @@ contract ImplMyNFTBridgeFunMigrateFromERC721  is ImplMemoryStructure, MyNFTBridg
         uint256 _destinationTokenId,
         address _destinationOwner,
         address _signee,
-        bytes32 _height
+        bytes32 _height,
+        bytes32 _forkHash
     ) internal view returns(bytes32){
         return generateMigrationHashArtificial(
             true,     
@@ -168,7 +173,8 @@ contract ImplMyNFTBridgeFunMigrateFromERC721  is ImplMemoryStructure, MyNFTBridg
             bytes32(_destinationTokenId),
             bytes32(uint(uint160(_destinationOwner))),
             bytes32(uint(uint160(_signee))),
-            _height
+            _height,
+            _forkHash
         );
     }
 
@@ -187,7 +193,8 @@ contract ImplMyNFTBridgeFunMigrateFromERC721  is ImplMemoryStructure, MyNFTBridg
         bytes32 _destinationTokenId,
         bytes32 _destinationOwner,
         bytes32 _signee,
-        bytes32 _originHeight
+        bytes32 _originHeight,
+        bytes32 _forkHash
     ) internal pure returns(bytes32) {
             return keccak256(
                 abi.encodePacked(
@@ -205,7 +212,7 @@ contract ImplMyNFTBridgeFunMigrateFromERC721  is ImplMemoryStructure, MyNFTBridg
                     _signee,
                     _originHeight
                 )
-            );
+            ) ^ _forkHash; //Xoring with the forkhash
     }
     
 //Generate the domain separator for V4 sign
